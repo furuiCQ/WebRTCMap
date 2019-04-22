@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-@ServerEndpoint("/websocket/{room}") // 客户端URI访问的路径
+@ServerEndpoint("/websocket/") // 客户端URI访问的路径
 @Component
 public class WebSocketServer {
     //存储可以用双向链表做，这样在删除和添加的时候查询方便效率更高
