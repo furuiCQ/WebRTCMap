@@ -1,4 +1,10 @@
 # WebRTCMap
+
+##项目介绍 
+本项目为https://blog.csdn.net/u011077027/article/details/86225524
+该博客的java后端版本。只支持http访问。
+正在努力支持https，这样就能使用coturn穿透了。
+
 ## Webrtc相关知识点
 ### Webrtc基础概念
 #### 一、协议
