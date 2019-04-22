@@ -195,7 +195,7 @@ public class WebSocketServer {
         send.setEventName("_ice_candidate");
         Map<String, Object> map = data;
         map.put("id", data.get("id"));
-        map.put("label", data.get("label"));
+        map.put("label", Integer.parseInt(session.getId()));
         map.put("candidate", data.get("candidate"));
         map.put("socketId", socket.getId());
         send.setData(map);
