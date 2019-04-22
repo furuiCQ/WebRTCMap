@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class Data {
     String eventName;
-    Map<String, String> data;
+    Map<String, Object> data;
 
     public String getEventName() {
         return eventName;
@@ -14,11 +14,11 @@ public class Data {
         this.eventName = eventName;
     }
 
-    public Map<String, String> getData() {
+    public Map<String, Object> getData() {
         return data;
     }
 
-    public void setData(Map<String, String> data) {
+    public void setData(Map<String, Object> data) {
         this.data = data;
     }
 }

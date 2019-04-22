@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-@ServerEndpoint("/websocket/") // 客户端URI访问的路径
+@ServerEndpoint("/websocket") // 客户端URI访问的路径
 @Component
 public class WebSocketServer {
     //存储可以用双向链表做，这样在删除和添加的时候查询方便效率更高
@@ -33,9 +33,11 @@ public class WebSocketServer {
             = new ConcurrentHashMap<>();//sessionId => roomId
     private static CopyOnWriteArrayList<Session> sockets = new CopyOnWriteArrayList<>();
     private Session session;
+
     @OnOpen
     public void onOpen(Session session) {
         this.session = session;
+        System.out.println(session.getId() + "建立连接");
         addSocket(session);
     }
 
@@ -46,17 +48,18 @@ public class WebSocketServer {
         CopyOnWriteArrayList<Session> curRoom;//= this.roomList.get(room);//获取对应房间的列表
         if (room != null) {
             curRoom = rooms.get(room);//获取对应房间的列表
-            for (int i = curRoom.size(); i > 0; i--) {
+            for (int i = 0; i < curRoom.size(); i++) {
                 if (curRoom.get(i).getId().equals(session.getId())) {
                     continue;
                 }
                 Data send = new Data();
                 send.setEventName("_remove_peer");
-                Map<String, String> map = new HashMap<>();
+                Map<String, Object> map = new HashMap<>();
                 map.put("socketId", session.getId());
                 send.setData(map);
                 curRoom.get(i).getAsyncRemote().sendText(new Gson().toJson(send));
             }
+
         }
         removeSocket(session);
         System.out.println(session.getId() + "用户离开");
@@ -140,9 +143,9 @@ public class WebSocketServer {
     }
 
 
-    void join(Map<String, String> data, Session socket) {
+    void join(Map<String, Object> data, Session socket) {
         //获得房间号
-        String room = data.get("room") == null ? "__default" : data.get("room");
+        String room = data.get("room") == null ? "__default" : data.get("room").toString();
         CopyOnWriteArrayList<String> ids = new CopyOnWriteArrayList<>();//存储sessionId
         CopyOnWriteArrayList<Session> curRoom = rooms.get(room);//获取对应房间的列表
         if (curRoom == null) {
@@ -158,7 +161,7 @@ public class WebSocketServer {
             ids.add(curSocket.getId());
             Data send = new Data();
             send.setEventName("_new_peer");
-            Map<String, String> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
             map.put("socketId", socket.getId());
             send.setData(map);
             curSocket.getAsyncRemote().sendText(new Gson().toJson(send));
@@ -170,8 +173,10 @@ public class WebSocketServer {
 
         Data send = new Data();
         send.setEventName("_peers");
-        Map<String, String> map = new HashMap<>();
-        map.put("connections", ids.toString());
+        Map<String, Object> map = new HashMap<>();
+        String[] connections = new String[ids.size()];
+        ids.toArray(connections);
+        map.put("connections", connections);
         map.put("you", socket.getId());
         send.setData(map);
         socket.getAsyncRemote().sendText(new Gson().toJson(send));
@@ -179,16 +184,16 @@ public class WebSocketServer {
         System.out.println("新用户" + socket.getId() + "加入房间" + room);
     }
 
-    void iceCandidate(Map<String, String> data, Session socket) {
+    void iceCandidate(Map<String, Object> data, Session socket) {
         //soc=this
-        Session session = getSocket(data.get("socketId"));
+        Session session = getSocket(data.get("socketId").toString());
         if (session == null) {
             return;
         }
 
         Data send = new Data();
         send.setEventName("_ice_candidate");
-        Map<String, String> map = data;
+        Map<String, Object> map = data;
         map.put("id", data.get("id"));
         map.put("label", data.get("label"));
         map.put("candidate", data.get("candidate"));
@@ -199,15 +204,15 @@ public class WebSocketServer {
         System.out.println("接收到来自" + socket.getId() + "的ICE Candidate");
     }
 
-    void offer(Map<String, String> data, Session socket) {
-        Session session = getSocket(data.get("socketId"));
+    void offer(Map<String, Object> data, Session socket) {
+        Session session = getSocket(data.get("socketId").toString());
         if (session == null) {
             return;
         }
         Data send = new Data();
         send.setEventName("_offer");
 
-        Map<String, String> map = data;
+        Map<String, Object> map = data;
         map.put("sdp", data.get("sdp"));
         map.put("socketId", socket.getId());
         send.setData(map);
@@ -217,8 +222,8 @@ public class WebSocketServer {
 
     }
 
-    void answer(Map<String, String> data, Session socket) {
-        Session session = getSocket(data.get("socketId"));
+    void answer(Map<String, Object> data, Session socket) {
+        Session session = getSocket(data.get("socketId").toString());
         if (session == null) {
             return;
         }
@@ -226,7 +231,7 @@ public class WebSocketServer {
         Data send = new Data();
         send.setEventName("_answer");
 
-        Map<String, String> map = data;
+        Map<String, Object> map = data;
         map.put("sdp", data.get("sdp"));
         map.put("socketId", socket.getId());
         send.setData(map);
