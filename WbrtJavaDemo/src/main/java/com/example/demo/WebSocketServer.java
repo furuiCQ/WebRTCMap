@@ -10,6 +10,7 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -195,7 +196,9 @@ public class WebSocketServer {
         send.setEventName("_ice_candidate");
         Map<String, Object> map = data;
         map.put("id", data.get("id"));
-        map.put("label", Integer.parseInt(session.getId()));
+        //对于BigDecimal进行处理
+        BigDecimal bigDecimal = new BigDecimal(data.get("label").toString());
+        map.put("label", bigDecimal.intValue());
         map.put("candidate", data.get("candidate"));
         map.put("socketId", socket.getId());
         send.setData(map);
@@ -230,7 +233,6 @@ public class WebSocketServer {
 
         Data send = new Data();
         send.setEventName("_answer");
-
         Map<String, Object> map = data;
         map.put("sdp", data.get("sdp"));
         map.put("socketId", socket.getId());
