@@ -1,21 +1,15 @@
 package com.example.demo;
 
-import com.google.gson.Gson;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 public class WebSocketController {
 
-
-    @RestController
-    @RequestMapping("websocket")
-    public class TestController {
-
-        @RequestMapping("test")
-        public String test() {
-            return "Hello World";
-        }
+    @RequestMapping("/index")
+    public String index() {
+        return "/welcome.html";
     }
+
 }
