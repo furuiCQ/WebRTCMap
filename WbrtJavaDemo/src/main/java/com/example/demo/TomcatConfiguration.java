@@ -12,8 +12,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class TomcatConfiguration {
-
-
     @Bean
     public ServletWebServerFactory servletContainer() {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
@@ -22,6 +20,7 @@ public class TomcatConfiguration {
         return tomcat;
     }
 
+    //配置监听http 8080
     private Connector createSslConnector() {
         Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
         connector.setScheme("http");

@@ -3,8 +3,56 @@
 ## 项目介绍 
 
 本项目为https://blog.csdn.net/u011077027/article/details/86225524
-该博客的java后端版本。只支持http访问。
-正在努力支持https，这样就能使用coturn穿透了。
+对应的JAVA服务端版本。
+
+端口配置如下：
+
+```java
+# 端口
+server.port=3000 #这里是https的端口号
+# 签名路径
+#配置模SSL
+server.ssl.key-store=keystore.p12 
+server.ssl.key-store-password=19831004
+server.ssl.keyStoreType=PKCS12
+server.ssl.key-alias=tomcat
+```
+
+
+
+如需开启http端口号则配置在TomcatConfiguration中有提到
+
+这里提出关键代码
+
+```java
+//配置监听http 8080
+    private Connector createSslConnector() {
+        Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
+        connector.setScheme("http");
+        //Connector监听的http的端口号
+        connector.setPort(8080);
+        connector.setSecure(false);
+        //监听到http的端口号后转向到的https的端口号
+        connector.setRedirectPort(3000);
+        return connector;
+    }
+```
+
+http和https的都支持。需要进行Nginx配置
+https需要针对博客中的代理配置修改下
+
+```java
+  #wss 反向代理  
+  location /wss {
+     proxy_pass https://websocket/; # 原文中的http改成https代理到上面的地址去
+     proxy_read_timeout 100s;
+     proxy_set_header Host $host;
+     proxy_set_header X-Real_IP $remote_addr;
+     proxy_set_header X-Forwarded-for $remote_addr;
+     proxy_set_header Upgrade $http_upgrade;
+     proxy_set_header Connection 'Upgrade';	
+  }
+```
 
 
 ## Webrtc相关知识点
@@ -31,5 +79,5 @@ NAT工作原理：NAT将自动修改IP报文的源IP地址和目的IP地址，Ip
 4.SDP
 5.
 
-#### 二、
+#### 二、待补充
 
